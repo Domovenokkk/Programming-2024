@@ -5,6 +5,8 @@ using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 using Lab1;
+using System.Security.Permissions;
+using System.Runtime.Intrinsics.X86;
 
 namespace Lab1
 {
@@ -143,6 +145,85 @@ namespace Lab1
                     kernel[i, j] = 1.0f / (float)(sizeX * sizeY);
                 }
             }
+        }
+    }
+
+    class GrayWorld : Filters
+    {
+        int NewR;
+        int NewG;
+        int NewB;
+        int Avg;
+        public GrayWorld(Bitmap sourceImage)
+        {
+            NewR = 0;
+            NewG = 0;
+            NewB = 0;
+            for (int i = 0; i < sourceImage.Height; i++)
+            {
+                for (int j = 0; j < sourceImage.Width; j++)
+                {
+                    Color c = sourceImage.GetPixel(j, i);
+                    NewR += c.R;
+                    NewG += c.G;
+                    NewB += c.B;
+                }
+            }
+            NewR = NewR / (sourceImage.Width * sourceImage.Height);
+            NewG = NewG / (sourceImage.Height * sourceImage.Width);
+            NewB = NewB / (sourceImage.Width * sourceImage.Height);
+            Avg = (NewR + NewB + NewG) / 3;
+        }
+
+        protected override Color calculateNewPixelColor(Bitmap sourceImage, int i, int j)
+        {
+            Color c = sourceImage.GetPixel(i, j);
+            return Color.FromArgb(
+                Clamp(c.R / NewR * Avg, 0, 255),
+                Clamp(c.G / NewG * Avg, 0, 255),
+                Clamp(c.B / NewB * Avg, 0, 255)
+                );
+        }
+    }
+
+    class PerfectReflector : Filters
+    {
+        int MaxR;
+        int MaxG;
+        int MaxB;
+        public PerfectReflector(Bitmap sourceImage) {
+            MaxR = -1;
+            MaxG = -1;
+            MaxB = -1;
+            for (int i = 0; i < sourceImage.Height; i++)
+            {
+                for (int j = 0; j < sourceImage.Width; j++)
+                {
+                    Color c = sourceImage.GetPixel(j, i);
+                    if (c.R > MaxR)
+                    {
+                        MaxR = c.R;
+                    }
+                    if (c.G > MaxG)
+                    {
+                        MaxG = c.G;
+                    }
+                    if (c.B > MaxB)
+                    {
+                        MaxB = c.B;
+                    }
+                }
+            }
+        }
+
+        protected override Color calculateNewPixelColor(Bitmap sourceImage, int i, int j)
+        {
+            Color c = sourceImage.GetPixel(i, j);
+            return Color.FromArgb(
+                Clamp(c.R / MaxR * 255, 0, 255),
+                Clamp(c.G / MaxG * 255 , 0, 255),
+                Clamp(c.B / MaxB * 255, 0, 255)
+                );
         }
     }
 

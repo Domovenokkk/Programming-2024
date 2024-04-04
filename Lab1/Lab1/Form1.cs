@@ -124,5 +124,48 @@ namespace Lab1
             Filters filter = new WaveHorizontal();
             backgroundWorker1.RunWorkerAsync(filter);
         }
+
+        private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (image == null)
+            {
+                MessageBox.Show("Изображение не найдено.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "PNG Files (.png)|.png|JPEG Files (.jpg)|.jpg|BMP Files (.bmp)|.bmp|All files (.)|.";
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    image.Save(saveDialog.FileName);
+                    MessageBox.Show("Изображение сохранено.", "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при сохранении изображения: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void увеличитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Size = new Size(1024,768);
+            //progressBar1.Location = new Point(12, 700);
+            //button1.Location = new Point(694, 700);
+        }
+
+        private void серыйМирToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new GrayWorld(image);
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void идеальныйОтражательToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new PerfectReflector(image);
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
     }
 }
