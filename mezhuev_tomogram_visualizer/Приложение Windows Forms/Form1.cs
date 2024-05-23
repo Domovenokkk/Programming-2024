@@ -1,16 +1,5 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace Приложение_Windows_Forms
 {
@@ -19,15 +8,19 @@ namespace Приложение_Windows_Forms
         public Form1()
         {
             InitializeComponent();
+            this.Load += Form1_Load;
+            trackBar1.Scroll += trackBar1_Scroll;
+            glControl1.Paint += glControl1_Paint;
         }
+
         enum Mode { Quads, Texture2D, QuadStrip };
         private Mode mode = Mode.Quads;
         private Bin bin;
         private View view;
         private bool loaded = false;
         private int currentLayer;
-        private DateTime NextFPSUpdate = DateTime.Now.AddSeconds(1);
-        private int FrameCount;
+        private DateTime nextFPSUpdate = DateTime.Now.AddSeconds(1);
+        private int frameCount;
         private bool needReload = false;
 
         private int min;
@@ -58,7 +51,7 @@ namespace Приложение_Windows_Forms
                 trackBar1.Maximum = Bin.Z - 1;
                 if (view == null)
                 {
-                    view= new View();
+                    view = new View();
                 }
                 view.SetupView(glControl1.Width, glControl1.Height);
                 loaded = true;
@@ -68,7 +61,7 @@ namespace Приложение_Windows_Forms
 
         private void glControl1_Paint(object sender, PaintEventArgs e)
         {
-            if (loaded) 
+            if (loaded)
             {
                 view.DrawQuads(currentLayer);
                 glControl1.SwapBuffers();
@@ -78,17 +71,18 @@ namespace Приложение_Windows_Forms
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             currentLayer = trackBar1.Value;
+            glControl1.Invalidate(); // Redraw with the new layer
         }
 
         void displayFPS()
         {
-            if (DateTime.Now >= NextFPSUpdate)
+            if (DateTime.Now >= nextFPSUpdate)
             {
-                this.Text = String.Format("CT Visualaiser (fps={0})", FrameCount);
-                NextFPSUpdate = DateTime.Now.AddSeconds(1);
-                FrameCount = 0;
+                this.Text = $"CT Visualizer (fps={frameCount})";
+                nextFPSUpdate = DateTime.Now.AddSeconds(1);
+                frameCount = 0;
             }
-            FrameCount++;
+            frameCount++;
         }
 
         void Application_Idle(object sender, EventArgs e)
