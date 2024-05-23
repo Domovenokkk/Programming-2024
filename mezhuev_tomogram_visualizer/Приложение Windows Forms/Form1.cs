@@ -10,10 +10,12 @@ namespace Приложение_Windows_Forms
             InitializeComponent();
             this.Load += Form1_Load;
             trackBar1.Scroll += trackBar1_Scroll;
+            trackBar2.Scroll += trackBar2_Scroll;
+            trackBar3.Scroll += trackBar3_Scroll;
             glControl1.Paint += glControl1_Paint;
         }
 
-        enum Mode { Quads, Texture2D, QuadStrip };
+        enum Mode { Quads, Texture, QuadStrip };
         private Mode mode = Mode.Quads;
         private Bin bin;
         private View view;
@@ -22,7 +24,6 @@ namespace Приложение_Windows_Forms
         private DateTime nextFPSUpdate = DateTime.Now.AddSeconds(1);
         private int frameCount;
         private bool needReload = false;
-
         private int min;
         private int width;
 
@@ -32,9 +33,9 @@ namespace Приложение_Windows_Forms
             bin = new Bin();
             view = new View();
             currentLayer = 1;
-            //min = trackBar2.Value;
-            //width = trackBar3.Value;
-            //radioButton1.Checked = true;
+            min = trackBar2.Value;
+            width = trackBar3.Value;
+            radioButton1.Checked = true;
         }
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -63,15 +64,77 @@ namespace Приложение_Windows_Forms
         {
             if (loaded)
             {
-                view.DrawQuads(currentLayer);
-                glControl1.SwapBuffers();
+                switch (mode)
+                {
+                    case Mode.Quads:
+                        view.DrawQuads(currentLayer, min, width);
+                        glControl1.SwapBuffers();
+                        break;
+                    case Mode.Texture:
+                        if (needReload)
+                        {
+                            view.generateTextureImage(currentLayer, min, width);
+                            view.Load2DTexture();
+                            needReload = false;
+                        }
+                        view.DrawTexture();
+                        glControl1.SwapBuffers();
+                        break;
+                    case Mode.QuadStrip:
+                        view.DrawQuadStrip(currentLayer, min, width);
+                        glControl1.SwapBuffers();
+                        break;
+                }
             }
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             currentLayer = trackBar1.Value;
-            glControl1.Invalidate(); // Redraw with the new layer
+            needReload = true;
+            glControl1.Invalidate();
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            min = trackBar2.Value;
+            needReload = true;
+            glControl1.Invalidate();
+        }
+
+        private void trackBar3_Scroll(object sender, EventArgs e)
+        {
+            width = trackBar3.Value;
+            needReload = true;
+            glControl1.Invalidate();
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton1.Checked)
+            {
+                mode = Mode.Quads;
+                glControl1.Invalidate();
+            }
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton2.Checked)
+            {
+                mode = Mode.QuadStrip;
+                glControl1.Invalidate();
+            }
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton3.Checked)
+            {
+                mode = Mode.Texture;
+                needReload = true;
+                glControl1.Invalidate();
+            }
         }
 
         void displayFPS()
