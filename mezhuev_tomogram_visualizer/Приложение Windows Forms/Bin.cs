@@ -17,7 +17,8 @@ namespace Приложение_Windows_Forms
         {
             if (File.Exists(path))
             {
-                BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open));
+                BinaryReader reader = 
+                    new BinaryReader(File.Open(path, FileMode.Open));
 
                 X = reader.ReadInt32();
                 Y = reader.ReadInt32();

@@ -41,22 +41,26 @@ namespace Приложение_Windows_Forms
                 {
                     short value;
                     // 1 вершина
-                    value = Bin.array[x_coord + y_coord * Bin.X + layerNamber * Bin.X * Bin.Y];
+                    value = Bin.array[x_coord + y_coord * Bin.X 
+                        + layerNamber * Bin.X * Bin.Y];
                     GL.Color3(TransferFunction(value));
                     GL.Vertex2(x_coord, y_coord);
 
                     //2 вершина
-                    value = Bin.array[x_coord + (y_coord + 1) * Bin.X + layerNamber * Bin.X * Bin.Y];
+                    value = Bin.array[x_coord + (y_coord + 1) * Bin.X 
+                        + layerNamber * Bin.X * Bin.Y];
                     GL.Color3(TransferFunction(value));
                     GL.Vertex2(x_coord, y_coord + 1);
 
                     //3 вершина
-                    value = Bin.array[x_coord + 1 + (y_coord + 1) * Bin.X + layerNamber * Bin.X * Bin.Y];
+                    value = Bin.array[x_coord + 1 + (y_coord + 1) * Bin.X 
+                        + layerNamber * Bin.X * Bin.Y];
                     GL.Color3(TransferFunction(value));
                     GL.Vertex2(x_coord + 1, y_coord + 1);
 
                     //4 вершина
-                    value = Bin.array[x_coord + 1 + y_coord * Bin.X + layerNamber * Bin.X * Bin.Y];
+                    value = Bin.array[x_coord + 1 + y_coord * Bin.X 
+                        + layerNamber * Bin.X * Bin.Y];
                     GL.Color3(TransferFunction(value));
                     GL.Vertex2(x_coord + 1, y_coord);
 

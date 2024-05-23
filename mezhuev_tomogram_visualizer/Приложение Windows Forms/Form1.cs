@@ -5,10 +5,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace Приложение_Windows_Forms
 {
@@ -18,18 +20,28 @@ namespace Приложение_Windows_Forms
         {
             InitializeComponent();
         }
-        private Bin bin = new Bin();
-        private View view = new View();
+        enum Mode { Quads, Texture2D, QuadStrip };
+        private Mode mode = Mode.Quads;
+        private Bin bin;
+        private View view;
         private bool loaded = false;
         private int currentLayer;
-        int FrameCount;
-        DateTime NextFPSUpdate = DateTime.Now.AddSeconds(1);
-        bool needReload = false;
+        private DateTime NextFPSUpdate = DateTime.Now.AddSeconds(1);
+        private int FrameCount;
+        private bool needReload = false;
 
+        private int min;
+        private int width;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             Application.Idle += Application_Idle;
+            bin = new Bin();
+            view = new View();
+            currentLayer = 1;
+            //min = trackBar2.Value;
+            //width = trackBar3.Value;
+            //radioButton1.Checked = true;
         }
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -38,8 +50,16 @@ namespace Приложение_Windows_Forms
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 string str = dialog.FileName;
+                if (bin == null)
+                {
+                    bin = new Bin();
+                }
                 bin.readBIN(str);
                 trackBar1.Maximum = Bin.Z - 1;
+                if (view == null)
+                {
+                    view= new View();
+                }
                 view.SetupView(glControl1.Width, glControl1.Height);
                 loaded = true;
                 glControl1.Invalidate();
@@ -58,7 +78,6 @@ namespace Приложение_Windows_Forms
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             currentLayer = trackBar1.Value;
-            needReload = true;
         }
 
         void displayFPS()
@@ -80,7 +99,5 @@ namespace Приложение_Windows_Forms
                 glControl1.Invalidate();
             }
         }
-
-
     }
 }
